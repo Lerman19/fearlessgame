@@ -137,19 +137,67 @@ http://localhost:5173
 
 Этот вариант нужен, если человек хочет скачать ZIP с GitHub и запускать проект из папки.
 
+Общая логика такая:
+
+1. Зайти на страницу проекта на GitHub.
+2. Скачать архив ZIP.
+3. Распаковать архив.
+4. Открыть распакованную папку.
+5. Создать файл `.env` с ключами GigaChat или оставить демо-режим.
+6. Запустить `node server.js`.
+7. Открыть `http://localhost:5173` в браузере.
+
 ### Windows
 
-1. Откройте GitHub:
+1. Откройте браузер: Chrome, Edge, Firefox или любой другой.
+2. В адресную строку вставьте ссылку на проект:
 
 ```text
 https://github.com/Lerman19/fearlessgame
 ```
 
-2. Нажмите `Code`.
-3. Нажмите `Download ZIP`.
-4. Распакуйте архив.
-5. В распакованной папке создайте файл `.env`.
-6. Вставьте в `.env`:
+3. Нажмите `Enter`.
+4. На странице GitHub найдите зеленую кнопку `Code`.
+   Она находится справа над списком файлов проекта.
+5. Нажмите `Code`.
+6. В открывшемся меню нажмите `Download ZIP`.
+7. Дождитесь скачивания файла.
+   Обычно он попадет в папку `Загрузки` или `Downloads`.
+8. Откройте папку `Загрузки`.
+9. Найдите файл примерно с таким названием:
+
+```text
+fearlessgame-main.zip
+```
+
+10. Кликните по архиву правой кнопкой мыши.
+11. Выберите `Извлечь все...` или `Extract All...`.
+12. Нажмите `Извлечь`.
+13. Откройте распакованную папку.
+    Обычно она называется:
+
+```text
+fearlessgame-main
+```
+
+14. Внутри должны быть файлы `server.js`, `README.md`, `package.json` и папка `public`.
+15. Создайте в этой папке файл `.env`.
+
+Если Windows не дает создать файл с именем `.env` через обычное меню:
+
+1. Откройте `Блокнот`.
+2. Вставьте настройки из примера ниже.
+3. Нажмите `Файл` -> `Сохранить как`.
+4. В поле `Имя файла` введите:
+
+```text
+.env
+```
+
+5. В поле `Тип файла` выберите `Все файлы`.
+6. Сохраните файл прямо в папку `fearlessgame-main`.
+
+Вставьте в `.env`:
 
 ```dotenv
 GIGACHAT_CLIENT_ID=ваш_client_id
@@ -167,33 +215,111 @@ GIGACHAT_AUTH_KEY=ваш_authorization_key
 GIGACHAT_IGNORE_TLS=true
 ```
 
-7. Кликните правой кнопкой мыши по пустому месту внутри папки.
-8. Выберите `Открыть в терминале` или `Открыть окно PowerShell здесь`.
-9. Введите:
+Если ключей GigaChat нет, можно оставить значения пустыми. Тогда игра запустится в демо-режиме:
+
+```dotenv
+GIGACHAT_CLIENT_ID=
+GIGACHAT_CLIENT_SECRET=
+GIGACHAT_AUTH_KEY=
+GIGACHAT_IGNORE_TLS=true
+```
+
+16. В папке `fearlessgame-main` кликните правой кнопкой мыши по пустому месту.
+17. Выберите `Открыть в терминале` или `Открыть окно PowerShell здесь`.
+18. Введите:
 
 ```powershell
 node server.js
 ```
 
-10. Откройте в браузере:
+19. Откройте в браузере:
 
 ```text
 http://localhost:5173
 ```
 
+Окно PowerShell не закрывайте, пока идет игра.
+
 ### macOS
 
-1. Откройте GitHub:
+1. Откройте браузер: Safari, Chrome, Firefox или любой другой.
+2. В адресную строку вставьте ссылку на проект:
 
 ```text
 https://github.com/Lerman19/fearlessgame
 ```
 
-2. Нажмите `Code`.
-3. Нажмите `Download ZIP`.
-4. Распакуйте архив.
-5. Откройте Terminal.
-6. Перетащите распакованную папку в окно Terminal после команды `cd`.
+3. Нажмите `Enter`.
+4. На странице GitHub найдите зеленую кнопку `Code`.
+   Она находится справа над списком файлов проекта.
+5. Нажмите `Code`.
+6. В открывшемся меню нажмите `Download ZIP`.
+7. Дождитесь скачивания файла.
+   Обычно он попадет в папку `Downloads` или `Загрузки`.
+8. Откройте папку `Downloads`.
+9. Найдите файл примерно с таким названием:
+
+```text
+fearlessgame-main.zip
+```
+
+10. Дважды кликните по архиву.
+11. Рядом появится распакованная папка:
+
+```text
+fearlessgame-main
+```
+
+12. Откройте эту папку.
+13. Внутри должны быть файлы `server.js`, `README.md`, `package.json` и папка `public`.
+14. Создайте файл `.env` в папке `fearlessgame-main`.
+
+Самый простой способ создать `.env` на Mac:
+
+1. Откройте `TextEdit`.
+2. В меню выберите `Format` -> `Make Plain Text`.
+3. Вставьте настройки из примера ниже.
+4. Нажмите `File` -> `Save`.
+5. В поле имени файла напишите:
+
+```text
+.env
+```
+
+6. Сохраните файл в папку `fearlessgame-main`.
+
+Вставьте в `.env`:
+
+```dotenv
+GIGACHAT_CLIENT_ID=ваш_client_id
+GIGACHAT_CLIENT_SECRET=ваш_ключ_или_client_secret
+GIGACHAT_AUTH_KEY=
+GIGACHAT_IGNORE_TLS=true
+```
+
+Если есть готовый `Authorization Key`, можно так:
+
+```dotenv
+GIGACHAT_CLIENT_ID=
+GIGACHAT_CLIENT_SECRET=
+GIGACHAT_AUTH_KEY=ваш_authorization_key
+GIGACHAT_IGNORE_TLS=true
+```
+
+Если ключей GigaChat нет, можно оставить значения пустыми. Тогда игра запустится в демо-режиме:
+
+```dotenv
+GIGACHAT_CLIENT_ID=
+GIGACHAT_CLIENT_SECRET=
+GIGACHAT_AUTH_KEY=
+GIGACHAT_IGNORE_TLS=true
+```
+
+15. Откройте `Terminal`.
+16. Введите `cd ` с пробелом в конце.
+17. Перетащите папку `fearlessgame-main` в окно Terminal.
+    Путь подставится сам.
+18. Нажмите `Enter`.
 
 Пример:
 
@@ -201,35 +327,19 @@ https://github.com/Lerman19/fearlessgame
 cd /Users/name/Downloads/fearlessgame-main
 ```
 
-7. Создайте файл `.env` в этой папке и вставьте:
-
-```dotenv
-GIGACHAT_CLIENT_ID=ваш_client_id
-GIGACHAT_CLIENT_SECRET=ваш_ключ_или_client_secret
-GIGACHAT_AUTH_KEY=
-GIGACHAT_IGNORE_TLS=true
-```
-
-Если есть готовый `Authorization Key`, можно так:
-
-```dotenv
-GIGACHAT_CLIENT_ID=
-GIGACHAT_CLIENT_SECRET=
-GIGACHAT_AUTH_KEY=ваш_authorization_key
-GIGACHAT_IGNORE_TLS=true
-```
-
-8. В Terminal запустите:
+19. В Terminal запустите:
 
 ```bash
 node server.js
 ```
 
-9. Откройте в браузере:
+20. Откройте в браузере:
 
 ```text
 http://localhost:5173
 ```
+
+Окно Terminal не закрывайте, пока идет игра.
 
 ## Если нужно поменять ключи GigaChat
 
