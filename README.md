@@ -63,7 +63,7 @@ GIGACHAT_IGNORE_TLS=true
 4. Вставьте команду:
 
 ```powershell
-npx --yes https://github.com/Lerman19/fearlessgame/archive/refs/heads/main.tar.gz
+npx.cmd --yes https://github.com/Lerman19/fearlessgame/archive/refs/heads/main.tar.gz
 ```
 
 5. При первом запуске программа спросит ключи GigaChat.
