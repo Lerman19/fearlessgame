@@ -1,9 +1,11 @@
 {
-  "name": "svoya-igra-gigachat",
+  "name": "fearlessgame",
   "version": "1.0.0",
-  "private": true,
   "description": "FearlessGame: локальная Своя игра с генерацией вопросов через GigaChat.",
   "main": "server.js",
+  "bin": {
+    "fearlessgame": "./bin/fearlessgame.js"
+  },
   "scripts": {
     "start": "node server.js"
   },

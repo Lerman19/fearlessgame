@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-const ENV_FILE = path.join(__dirname, ".env");
+const ENV_FILE = process.env.FEARLESSGAME_ENV_FILE || path.join(__dirname, ".env");
 loadEnvFile();
 
 const PORT = Number(process.env.PORT || 5173);
@@ -241,6 +241,7 @@ function buildPrompt(topic) {
     "Не используй английские слова, транслитерацию и латиницу, кроме общепринятых символов вроде pH, DNA, HTML.",
     "Вопросы должны быть однозначными, без вариантов ответа, без устаревших спорных фактов.",
     "У каждого вопроса должен быть один конкретный правильный ответ.",
+    "Ответ не должен повторять слова из вопроса и не должен содержать однокоренные слова из текста вопроса.",
     "Не задавай вопросы, где нужно перечислить несколько объектов, назвать несколько причин, несколько авторов или набор элементов.",
     "Избегай формулировок: «какие», «назовите несколько», «перечислите», «какие два», «какие три».",
     "Ответ должен быть коротким, но достаточным для проверки ведущим.",
@@ -292,6 +293,7 @@ async function generateFinalQuestionWithGigaChat() {
           "Не задавай вопросы на продолжение цитаты, точную реплику персонажа или малоизвестную формулировку.",
           "Выбирай общеизвестный проверяемый факт из истории, науки, географии, искусства или литературы.",
           "Все должно быть на русском языке.",
+          "Ответ не должен повторять слова из вопроса и не должен содержать однокоренные слова из текста вопроса.",
           "Верни одну строку строго в формате:",
           "Категория|Вопрос|Ответ|Короткая справка",
           "Не используй вертикальную черту внутри полей."
@@ -343,6 +345,7 @@ async function verifyFinalQuestionWithGigaChat(token, question) {
         content: [
           "Проверь финальный вопрос.",
           "Ответ должен быть фактически верным, коротким и однозначным.",
+          "Ответ не должен повторять слова из вопроса и не должен содержать однокоренные слова из текста вопроса.",
           "Вопрос не должен требовать продолжить цитату или вспомнить точную реплику персонажа.",
           "Если вопрос слишком узкий, спорный или плохо проверяемый, замени его на общеизвестный сложный факт.",
           "Если вопрос или ответ сомнительные, замени их.",
@@ -372,7 +375,12 @@ function normalizeFinalQuestion(question) {
   };
 
   applyJeopardyCapitalFix(normalized);
-  if (!normalized.question || !normalized.answer || hasTooMuchLatin(Object.values(normalized).join(" "))) {
+  if (
+    !normalized.question ||
+    !normalized.answer ||
+    hasTooMuchLatin(Object.values(normalized).join(" ")) ||
+    hasQuestionAnswerRootOverlap(normalized.question, [normalized.answer])
+  ) {
     return fallback;
   }
 
@@ -446,6 +454,7 @@ async function generateCategoryRows(token, topic, categoryName) {
           "Все вопросы, ответы и справки должны быть только на русском языке.",
           "Не используй английские слова, транслитерацию и латиницу, кроме общепринятых символов вроде pH, DNA, HTML.",
           "У каждого вопроса должен быть один конкретный правильный ответ.",
+          "Ответ не должен повторять слова из вопроса и не должен содержать однокоренные слова из текста вопроса.",
           "Не задавай вопросы, где нужно перечислить несколько объектов, назвать несколько причин, несколько авторов или набор элементов.",
           "Избегай формулировок: «какие», «назовите несколько», «перечислите», «какие два», «какие три».",
           "Верни только 5 строк без markdown, заголовков, нумерации и пояснений.",
@@ -572,6 +581,7 @@ async function verifyJeopardyPackWithGigaChat(token, pack, topic) {
           "Проверь пакет для игры «Своя игра».",
           "Каждый ответ должен быть фактически верным и однозначным.",
           "У каждого вопроса должен быть один конкретный правильный ответ.",
+          "Ответ не должен повторять слова из вопроса и не должен содержать однокоренные слова из текста вопроса.",
           "Если вопрос требует перечислить несколько объектов, заменить его на вопрос с одним ответом.",
           "Запрещены вопросы с формулировками «какие», «какие два», «какие три», «перечислите», «назовите несколько».",
           "Если ответ неверный, исправь ответ. Если сам вопрос плохой или спорный, замени весь вопрос на корректный.",
@@ -714,15 +724,19 @@ function normalizePack(pack, topic) {
   });
 
   categories.forEach((category) => {
-    const demoCategory = createDemoPack(topic).categories[0];
+    const demoPack = createDemoPack(topic);
     category.questions.forEach((question, questionIndex) => {
       if (!question.question || !question.answer) {
         throw new Error("Каждый вопрос должен содержать текст и ответ.");
       }
       applyJeopardyCapitalFix(question);
       const text = [question.question, question.answer, question.fact].join(" ");
-      if (hasTooMuchLatin(text) || isEnumerationQuestion(question.question)) {
-        const replacement = demoCategory.questions[questionIndex];
+      if (
+        hasTooMuchLatin(text) ||
+        isEnumerationQuestion(question.question) ||
+        hasQuestionAnswerRootOverlap(question.question, [question.answer])
+      ) {
+        const replacement = findDemoJeopardyReplacement(demoPack, questionIndex);
         question.question = replacement.question;
         question.answer = replacement.answer;
         question.fact = replacement.fact;
@@ -740,6 +754,89 @@ function normalizePack(pack, topic) {
 function isEnumerationQuestion(question) {
   const text = String(question || "").trim().toLowerCase();
   return /^(какие|каких|какими|назовите\s+несколько|перечислите|какие\s+два|какие\s+три|какие\s+из)/i.test(text);
+}
+
+function findDemoJeopardyReplacement(pack, questionIndex) {
+  const candidates = pack.categories.flatMap((category) => category.questions);
+  return (
+    candidates.find(
+      (question) =>
+        question.value === (questionIndex + 1) * 100 &&
+        !hasQuestionAnswerRootOverlap(question.question, [question.answer])
+    ) ||
+    candidates.find((question) => !hasQuestionAnswerRootOverlap(question.question, [question.answer])) ||
+    candidates[questionIndex] ||
+    candidates[0]
+  );
+}
+
+function hasQuestionAnswerRootOverlap(question, answers) {
+  const questionStems = extractMeaningfulStems(question);
+  return answers.some((answer) =>
+    Array.from(extractMeaningfulStems(answer)).some((stem) => questionStems.has(stem))
+  );
+}
+
+function extractMeaningfulStems(text) {
+  const stopwords = new Set([
+    "какой",
+    "какая",
+    "какое",
+    "какие",
+    "каких",
+    "какими",
+    "кто",
+    "что",
+    "где",
+    "когда",
+    "как",
+    "куда",
+    "откуда",
+    "почему",
+    "зачем",
+    "этот",
+    "эта",
+    "это",
+    "эти",
+    "его",
+    "для",
+    "при",
+    "под",
+    "над",
+    "между",
+    "через",
+    "после",
+    "перед",
+    "или",
+    "без",
+    "был",
+    "была",
+    "было",
+    "были",
+    "стал",
+    "стала",
+    "стало",
+    "стали",
+    "называется",
+    "называют",
+    "считается",
+    "является"
+  ]);
+
+  return new Set(
+    (String(text || "").toLowerCase().replace(/ё/g, "е").match(/[а-яе]{4,}/gi) || [])
+      .filter((word) => !stopwords.has(word))
+      .map((word) => normalizeRussianStem(word))
+      .filter((stem) => stem.length >= 4 && !stopwords.has(stem))
+  );
+}
+
+function normalizeRussianStem(word) {
+  const stem = String(word || "").replace(
+    /(иями|ями|ами|ого|его|ому|ему|ыми|ими|ией|иям|ием|иях|ая|яя|ое|ее|ые|ие|ый|ий|ой|ей|ам|ям|ах|ях|ов|ев|ом|ем|ую|юю|а|я|ы|и|о|е|у|ю)$/i,
+    ""
+  );
+  return stem.length >= 4 ? stem : word;
 }
 
 function applyJeopardyCapitalFix(question) {
@@ -766,7 +863,7 @@ function createDemoPack(topic) {
       ["Как назывался корабль экспедиции Магеллана, завершивший первое кругосветное плавание?", "Виктория", "Сам Магеллан не дожил до конца экспедиции."],
       ["В каком году началась Первая мировая война?", "1914", "Поводом стало убийство эрцгерцога Франца Фердинанда."],
       ["Какой город был столицей Византийской империи?", "Константинополь", "Сейчас это Стамбул."],
-      ["Какой мирный договор завершил Тридцатилетнюю войну?", "Вестфальский мир", "Он был заключен в 1648 году."]
+      ["Какой договор завершил Тридцатилетнюю войну?", "Вестфальский мир", "Он был заключен в 1648 году."]
     ],
     [
       ["Какая планета ближе всего к Солнцу?", "Меркурий", "У Меркурия самый короткий год в Солнечной системе."],
@@ -786,7 +883,7 @@ function createDemoPack(topic) {
       ["Какая страна занимает целый материк?", "Австралия", "Это также название континента."],
       ["Какая река самая длинная в Европе?", "Волга", "Она впадает в Каспийское море."],
       ["Столица Канады?", "Оттава", "Город находится в провинции Онтарио."],
-      ["Какой пролив отделяет Африку от Европы у Испании?", "Гибралтарский пролив", "Он соединяет Атлантику и Средиземное море."],
+      ["Что отделяет Африку от Европы у Испании?", "Гибралтарский пролив", "Он соединяет Атлантику и Средиземное море."],
       ["Какая пустыня считается самой сухой неполярной пустыней?", "Атакама", "Она находится в Южной Америке."]
     ],
     [
@@ -848,6 +945,7 @@ function buildMillionairePrompt(topic) {
     "У каждого вопроса должно быть ровно 4 варианта ответа.",
     "Все вопросы, варианты ответа и справки должны быть на русском языке.",
     "Не используй английские слова, транслитерацию и латиницу, кроме общепринятых символов вроде pH, DNA, HTML.",
+    "Варианты ответа не должны повторять слова из вопроса и не должны содержать однокоренные слова из текста вопроса.",
     "Правильный вариант должен быть указан только буквой A, B, C или D.",
     "Верни только 15 строк без markdown, заголовков, нумерации и пояснений.",
     "Формат строки:",
@@ -949,8 +1047,8 @@ function parseMillionaireFromLines(content, topic) {
   const russianDemo = createDemoMillionaire(topic).questions;
   questions.forEach((question, index) => {
     const text = [question.question, ...question.options, question.fact].join(" ");
-    if (hasTooMuchLatin(text)) {
-      const replacement = russianDemo[index];
+    if (hasTooMuchLatin(text) || hasQuestionAnswerRootOverlap(question.question, question.options)) {
+      const replacement = findDemoMillionaireReplacement(russianDemo, index);
       question.question = replacement.question;
       question.options = replacement.options;
       question.correctIndex = replacement.correctIndex;
@@ -1002,6 +1100,7 @@ async function verifyMillionairePackWithGigaChat(token, pack, topic) {
           "У каждого вопроса должен быть ровно один фактически верный ответ.",
           "Если правильная буква неверна, исправь букву. Если среди вариантов нет верного ответа, замени варианты или весь вопрос.",
           "Все вопросы, варианты и справки должны быть только на русском языке.",
+          "Варианты ответа не должны повторять слова из вопроса и не должны содержать однокоренные слова из текста вопроса.",
           "Правильный вариант указывай только буквой A, B, C или D.",
           "Верни ровно 15 строк без markdown, заголовков, нумерации и пояснений.",
           "Формат строки:",
@@ -1027,6 +1126,19 @@ function hasTooMuchLatin(text) {
   const latinWords = String(text || "").match(/[A-Za-z]{3,}/g) || [];
   const allowed = new Set(["DNA", "HTML", "HTTP", "CSS", "USB", "WiFi", "pH"]);
   return latinWords.filter((word) => !allowed.has(word)).length >= 2;
+}
+
+function findDemoMillionaireReplacement(questions, index) {
+  return (
+    questions.find(
+      (question) =>
+        question.level === index + 1 &&
+        !hasQuestionAnswerRootOverlap(question.question, question.options)
+    ) ||
+    questions.find((question) => !hasQuestionAnswerRootOverlap(question.question, question.options)) ||
+    questions[index] ||
+    questions[0]
+  );
 }
 
 function parseMillionaireBlocks(content) {
