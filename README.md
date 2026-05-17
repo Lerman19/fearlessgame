@@ -2,21 +2,43 @@
 
 Темная неоновая викторина для ведущего с двумя режимами: «Своя игра» и «Кто хочет стать миллионером?». GigaChat генерирует вопросы, а приложение ведет счет и игровые состояния в браузере.
 
-Игра запускается в браузере, но для генерации вопросов нужен маленький локальный сервер на Node.js. VS Code и навыки программирования не нужны.
+Игра запускается как обычный сайт в браузере, но рядом работает маленький локальный сервер на Node.js. VS Code, Git и навыки программирования не нужны.
 
-## Что нужно установить
+GitHub проекта:
 
-1. Скачайте Node.js LTS с официального сайта:
+```text
+https://github.com/Lerman19/fearlessgame
+```
 
-   https://nodejs.org/en/download
+## Самый простой вариант
 
-2. На Windows выберите `Windows Installer (.msi)` и установите как обычную программу.
+Этот способ не требует скачивать проект вручную. Человек устанавливает Node.js, вставляет одну команду, и игра сама открывается в браузере.
 
-3. Во время установки можно нажимать `Next`, ничего специально менять не нужно.
+При первом запуске программа спросит ключи GigaChat. Если ключей нет, можно просто нажимать `Enter` - игра откроется в демо-режиме.
 
-4. После установки перезагрузите компьютер или хотя бы закройте и заново откройте PowerShell.
+Ключи сохраняются только на компьютере игрока:
 
-## Как проверить Node.js
+- Windows: `%APPDATA%\FearlessGame\.env`
+- macOS: `~/.fearlessgame/.env`
+
+В GitHub ключи не отправляются.
+
+## Windows: запуск без скачивания проекта
+
+### 1. Установить Node.js
+
+1. Откройте сайт:
+
+```text
+https://nodejs.org/en/download
+```
+
+2. Скачайте `Windows Installer (.msi)` для версии LTS.
+3. Запустите установщик.
+4. В установщике можно нажимать `Next`, ничего специально менять не нужно.
+5. После установки закройте все окна PowerShell, если они были открыты.
+
+### 2. Проверить Node.js
 
 1. Нажмите `Win + R`.
 2. Введите `powershell`.
@@ -27,75 +49,80 @@
 node -v
 ```
 
-Если появилась версия вроде `v24.15.0`, значит Node.js установлен.
+Если появилась версия вроде `v24.15.0` или `v22.13.1`, значит все нормально.
 
-## Как настроить GigaChat
+### 3. Запустить FearlessGame
 
-В папке игры есть файл `.env`. Откройте его обычным Блокнотом и заполните ключи:
-
-```dotenv
-GIGACHAT_CLIENT_ID=ваш_client_id
-GIGACHAT_CLIENT_SECRET=ваш_ключ_или_authorization_key
-GIGACHAT_AUTH_KEY=
-GIGACHAT_IGNORE_TLS=true
-```
-
-Если у вас есть готовый `Authorization Key`, можно вставить его так:
-
-```dotenv
-GIGACHAT_CLIENT_ID=
-GIGACHAT_CLIENT_SECRET=
-GIGACHAT_AUTH_KEY=ваш_authorization_key
-GIGACHAT_IGNORE_TLS=true
-```
-
-После изменения файла обязательно сохраните `.env`.
-
-## Как запустить игру
-
-### Самый простой запуск через GitHub без скачивания проекта
-
-Этот вариант подходит человеку без VS Code и без навыков программирования. Нужно установить только Node.js.
-
-1. Нажмите `Win + R`.
-2. Введите `powershell`.
-3. Нажмите `Enter`.
-4. Вставьте команду:
+В том же окне PowerShell вставьте:
 
 ```powershell
 npx.cmd --yes https://github.com/Lerman19/fearlessgame/archive/refs/heads/main.tar.gz
 ```
 
-5. При первом запуске программа спросит ключи GigaChat.
-   Если ключей нет, можно просто нажимать `Enter` - игра откроется в демо-режиме.
-6. Браузер откроется сам. Если не открылся, зайдите на:
+При первом запуске:
+
+1. Если есть `GigaChat Authorization Key`, вставьте его и нажмите `Enter`.
+2. Если такого ключа нет, нажмите `Enter`.
+3. Потом можно вставить `Client ID` и `Client Secret`.
+4. Если ключей вообще нет, просто нажимайте `Enter` - запустится демо-режим.
+
+Браузер должен открыться сам. Если не открылся, откройте вручную:
 
 ```text
 http://localhost:5173
 ```
 
-Важно: окно PowerShell закрывать нельзя, пока идет игра. Если закрыть окно, сервер остановится.
+Важно: окно PowerShell закрывать нельзя, пока идет игра. Если закрыть окно, игра остановится.
 
-Ключи GigaChat при таком запуске сохраняются только на компьютере игрока в локальной папке настроек FearlessGame. В GitHub они не отправляются.
+## macOS: запуск без скачивания проекта
 
-### Запуск из скачанной папки
+### 1. Установить Node.js
 
-1. Откройте папку с игрой.
-2. Кликните правой кнопкой мыши по пустому месту внутри папки.
-3. Выберите `Открыть в терминале` или `Открыть окно PowerShell здесь`.
-4. Введите:
+1. Откройте сайт:
 
-```powershell
-node server.js
+```text
+https://nodejs.org/en/download
 ```
 
-5. Откройте в браузере:
+2. Скачайте установщик для macOS, обычно это файл `.pkg` версии LTS.
+3. Откройте скачанный `.pkg`.
+4. Пройдите установку как обычную программу.
+5. После установки закройте Terminal, если он был открыт.
+
+### 2. Проверить Node.js
+
+1. Откройте `Terminal`.
+   Его можно найти через `Spotlight`: нажмите `Cmd + Space`, введите `Terminal`, нажмите `Enter`.
+2. Вставьте команду:
+
+```bash
+node -v
+```
+
+Если появилась версия вроде `v24.15.0` или `v22.13.1`, значит все нормально.
+
+### 3. Запустить FearlessGame
+
+В Terminal вставьте:
+
+```bash
+npx --yes https://github.com/Lerman19/fearlessgame/archive/refs/heads/main.tar.gz
+```
+
+При первом запуске:
+
+1. Если есть `GigaChat Authorization Key`, вставьте его и нажмите `Enter`.
+2. Если такого ключа нет, нажмите `Enter`.
+3. Потом можно вставить `Client ID` и `Client Secret`.
+4. Если ключей вообще нет, просто нажимайте `Enter` - запустится демо-режим.
+
+Браузер должен открыться сам. Если не открылся, откройте вручную:
 
 ```text
 http://localhost:5173
 ```
 
-Важно: окно PowerShell закрывать нельзя, пока идет игра. Если закрыть окно, сервер остановится.
+Важно: окно Terminal закрывать нельзя, пока идет игра. Если закрыть окно, игра остановится.
 
 ## Как играть
 
@@ -106,15 +133,163 @@ http://localhost:5173
 5. Нажмите `Сгенерировать и начать`.
 6. Игра сама покажет поле, варианты ответов, подсказки и счет.
 
+## Как запустить из скачанной папки
+
+Этот вариант нужен, если человек хочет скачать ZIP с GitHub и запускать проект из папки.
+
+### Windows
+
+1. Откройте GitHub:
+
+```text
+https://github.com/Lerman19/fearlessgame
+```
+
+2. Нажмите `Code`.
+3. Нажмите `Download ZIP`.
+4. Распакуйте архив.
+5. В распакованной папке создайте файл `.env`.
+6. Вставьте в `.env`:
+
+```dotenv
+GIGACHAT_CLIENT_ID=ваш_client_id
+GIGACHAT_CLIENT_SECRET=ваш_ключ_или_client_secret
+GIGACHAT_AUTH_KEY=
+GIGACHAT_IGNORE_TLS=true
+```
+
+Если есть готовый `Authorization Key`, можно так:
+
+```dotenv
+GIGACHAT_CLIENT_ID=
+GIGACHAT_CLIENT_SECRET=
+GIGACHAT_AUTH_KEY=ваш_authorization_key
+GIGACHAT_IGNORE_TLS=true
+```
+
+7. Кликните правой кнопкой мыши по пустому месту внутри папки.
+8. Выберите `Открыть в терминале` или `Открыть окно PowerShell здесь`.
+9. Введите:
+
+```powershell
+node server.js
+```
+
+10. Откройте в браузере:
+
+```text
+http://localhost:5173
+```
+
+### macOS
+
+1. Откройте GitHub:
+
+```text
+https://github.com/Lerman19/fearlessgame
+```
+
+2. Нажмите `Code`.
+3. Нажмите `Download ZIP`.
+4. Распакуйте архив.
+5. Откройте Terminal.
+6. Перетащите распакованную папку в окно Terminal после команды `cd`.
+
+Пример:
+
+```bash
+cd /Users/name/Downloads/fearlessgame-main
+```
+
+7. Создайте файл `.env` в этой папке и вставьте:
+
+```dotenv
+GIGACHAT_CLIENT_ID=ваш_client_id
+GIGACHAT_CLIENT_SECRET=ваш_ключ_или_client_secret
+GIGACHAT_AUTH_KEY=
+GIGACHAT_IGNORE_TLS=true
+```
+
+Если есть готовый `Authorization Key`, можно так:
+
+```dotenv
+GIGACHAT_CLIENT_ID=
+GIGACHAT_CLIENT_SECRET=
+GIGACHAT_AUTH_KEY=ваш_authorization_key
+GIGACHAT_IGNORE_TLS=true
+```
+
+8. В Terminal запустите:
+
+```bash
+node server.js
+```
+
+9. Откройте в браузере:
+
+```text
+http://localhost:5173
+```
+
+## Если нужно поменять ключи GigaChat
+
+При запуске через `npx` ключи спрашиваются только в первый раз.
+
+На Windows файл с ключами лежит здесь:
+
+```text
+%APPDATA%\FearlessGame\.env
+```
+
+Быстро открыть папку можно так:
+
+1. Нажмите `Win + R`.
+2. Вставьте:
+
+```text
+%APPDATA%\FearlessGame
+```
+
+3. Нажмите `Enter`.
+4. Откройте `.env` Блокнотом и поменяйте ключи.
+
+На macOS файл лежит здесь:
+
+```text
+~/.fearlessgame/.env
+```
+
+Открыть его через Terminal можно командой:
+
+```bash
+open ~/.fearlessgame
+```
+
 ## Если что-то не работает
 
-`node` не распознается как команда:
+`node` не распознается как команда на Windows:
 
-Установите Node.js LTS с https://nodejs.org/en/download, затем заново откройте PowerShell.
+Установите Node.js LTS с `https://nodejs.org/en/download`, затем закройте и заново откройте PowerShell.
+
+`npx` заблокирован на Windows:
+
+Используйте именно эту команду:
+
+```powershell
+npx.cmd --yes https://github.com/Lerman19/fearlessgame/archive/refs/heads/main.tar.gz
+```
+
+На macOS команда `node -v` не работает:
+
+Установите Node.js LTS через `.pkg` с официального сайта, затем закройте и заново откройте Terminal.
 
 Сайт не открывается:
 
-Проверьте, что в PowerShell запущена команда `node server.js` и окно не закрыто. Адрес должен быть именно `http://localhost:5173`.
+Проверьте, что окно PowerShell или Terminal не закрыто. Адрес должен быть именно:
+
+```text
+http://localhost:5173
+```
 
 Игра пишет, что GigaChat не настроен:
 
@@ -132,16 +307,28 @@ GIGACHAT_IGNORE_TLS=true
 
 Это лимит GigaChat. Подождите 1-2 минуты и попробуйте снова.
 
-## Как передать игру другому человеку
+## Что лучше отправить другому человеку
 
-1. Скопируйте всю папку игры в ZIP-архив.
-2. Не передавайте свой `.env`, если не хотите делиться ключом GigaChat.
-3. Вместо него можно передать `.env.example` и попросить человека создать свой `.env`.
-4. Получатель устанавливает Node.js, заполняет `.env`, запускает `node server.js` и открывает `http://localhost:5173`.
+Самый удобный текст для отправки:
+
+```text
+1. Установи Node.js LTS: https://nodejs.org/en/download
+
+2. Если Windows: открой PowerShell и вставь:
+npx.cmd --yes https://github.com/Lerman19/fearlessgame/archive/refs/heads/main.tar.gz
+
+3. Если Mac: открой Terminal и вставь:
+npx --yes https://github.com/Lerman19/fearlessgame/archive/refs/heads/main.tar.gz
+
+4. Когда откроется браузер, играй на http://localhost:5173
+
+Окно PowerShell или Terminal не закрывай, пока идет игра.
+```
 
 ## Файлы проекта
 
 - `server.js` - локальный сервер и безопасный запрос к GigaChat.
+- `bin/fearlessgame.js` - запуск через `npx` из GitHub.
 - `public/index.html` - страница игры.
 - `public/app.js` - логика интерфейса и начисления очков.
 - `public/styles.css` - внешний вид.
