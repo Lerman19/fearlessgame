@@ -1,0 +1,8 @@
+.env
+server.log
+server.err.log
+last-gigachat-response.txt
+last-gigachat-repaired.txt
+last-gigachat-verified.txt
+last-millionaire-response.txt
+last-millionaire-verified.txt

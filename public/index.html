@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FearlessGame</title>
+    <link rel="icon" href="/assets/logo.svg" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="brand-row">
+        <div class="brand-lockup">
+          <img class="brand-mark" src="/assets/logo.svg" alt="" />
+          <div>
+            <p class="eyebrow">Neon quiz arena</p>
+            <h1>FearlessGame</h1>
+          </div>
+        </div>
+        <div class="studio-credit" aria-label="A Lero Digital Product">
+          <span>crafted by</span>
+          <strong>Lero Digital</strong>
+        </div>
+      </header>
+
+      <section class="home-view" id="homeView">
+        <div class="home-heading">
+          <h2>Выберите игру</h2>
+          <span class="status-pill" id="apiStatus">Проверяем GigaChat</span>
+        </div>
+        <div class="game-choice-grid">
+          <article class="game-choice">
+            <p class="eyebrow">5 x 5</p>
+            <h3>Своя игра</h3>
+            <p>Категории, вопросы от 100 до 500 очков и автоматический счет для нескольких участников.</p>
+            <button class="primary-button" type="button" id="chooseJeopardyButton">Играть</button>
+          </article>
+          <article class="game-choice millionaire-choice">
+            <p class="eyebrow">15 вопросов</p>
+            <h3>Кто хочет стать миллионером?</h3>
+            <p>Один игрок, четыре варианта ответа, подсказки и путь к 3 000 000.</p>
+            <button class="primary-button" type="button" id="chooseMillionaireButton">Играть</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="setup-view hidden" id="setupView">
+        <div class="setup-grid">
+          <section class="setup-panel">
+            <div class="panel-heading">
+              <h2>GigaChat</h2>
+            </div>
+            <p class="hint">GigaChat автоматически соберет разнообразный пакет: 5 категорий по 5 вопросов от 100 до 500 очков.</p>
+          </section>
+
+          <section class="setup-panel">
+            <div class="panel-heading">
+              <h2>Участники</h2>
+              <button class="ghost-button" type="button" id="addPlayerButton">Добавить</button>
+            </div>
+            <div class="players-form" id="playersForm"></div>
+          </section>
+        </div>
+
+        <div class="setup-actions">
+          <button class="ghost-button" type="button" data-go-home>Назад</button>
+          <button class="primary-button" type="button" id="startButton">Сгенерировать и начать</button>
+          <span class="setup-message" id="setupMessage"></span>
+        </div>
+      </section>
+
+      <section class="setup-view hidden" id="millionaireSetupView">
+        <div class="setup-grid">
+          <section class="setup-panel">
+            <div class="panel-heading">
+              <h2>GigaChat</h2>
+            </div>
+            <p class="hint">GigaChat автоматически подготовит 15 вопросов общей эрудиции с четырьмя вариантами ответа и растущей сложностью.</p>
+          </section>
+
+          <section class="setup-panel">
+            <div class="panel-heading">
+              <h2>Игрок</h2>
+            </div>
+            <label class="field-label" for="millionairePlayerInput">Имя игрока</label>
+            <input
+              id="millionairePlayerInput"
+              class="text-input"
+              type="text"
+              maxlength="32"
+              placeholder="Участник"
+            />
+          </section>
+        </div>
+
+        <div class="setup-actions">
+          <button class="ghost-button" type="button" data-go-home>Назад</button>
+          <button class="primary-button" type="button" id="startMillionaireButton">Сгенерировать и начать</button>
+          <span class="setup-message" id="millionaireSetupMessage"></span>
+        </div>
+      </section>
+
+      <section class="game-view hidden" id="gameView">
+        <header class="game-header">
+          <div class="game-title">
+            <img class="small-mark" src="/assets/logo.svg" alt="" />
+            <div>
+              <p class="eyebrow" id="sourceLabel">GigaChat</p>
+              <h1 id="packTitle">Своя игра</h1>
+            </div>
+          </div>
+          <div class="header-actions">
+            <button class="ghost-button" type="button" data-go-home>На главную</button>
+            <button class="ghost-button" type="button" id="newGameButton">Новая игра</button>
+          </div>
+        </header>
+
+        <section class="scoreboard" id="scoreboard" aria-label="Счет участников"></section>
+        <section class="board" id="board" aria-label="Игровое поле"></section>
+        <p class="game-note">
+          Ведущий выбирает вопрос, показывает ответ и нажимает участника: верный ответ прибавляет очки,
+          неверный снимает их и оставляет вопрос открытым для других.
+        </p>
+        <p class="finish-note" id="finishNote"></p>
+      </section>
+
+      <section class="game-view hidden" id="finalView">
+        <header class="game-header">
+          <div class="game-title">
+            <img class="small-mark" src="/assets/logo.svg" alt="" />
+            <div>
+              <p class="eyebrow" id="finalSourceLabel">Финал</p>
+              <h1>Финальный раунд</h1>
+            </div>
+          </div>
+          <div class="header-actions">
+            <button class="ghost-button" type="button" data-go-home>На главную</button>
+            <button class="ghost-button" type="button" id="finalBackButton">К итогам</button>
+          </div>
+        </header>
+
+        <section class="final-panel">
+          <div class="finalists-grid" id="finalistsGrid"></div>
+          <div class="final-actions" id="finalBetActions">
+            <button class="primary-button" type="button" id="startFinalQuestionButton">Открыть финальный вопрос</button>
+            <span class="setup-message" id="finalMessage"></span>
+          </div>
+
+          <article class="final-question hidden" id="finalQuestionBox">
+            <div class="question-topline">
+              <span id="finalCategory">Финал</span>
+              <strong id="finalTimer">01:00</strong>
+            </div>
+            <h2 id="finalQuestionText"></h2>
+            <div class="answer-box hidden" id="finalAnswerBox">
+              <span>Ответ</span>
+              <strong id="finalAnswerText"></strong>
+              <p id="finalFactText"></p>
+            </div>
+            <div class="dialog-actions">
+              <button class="ghost-button" type="button" id="showFinalAnswerButton">Показать ответ</button>
+            </div>
+            <div class="judge-grid">
+              <section>
+                <h3>Верно</h3>
+                <div id="finalCorrectButtons" class="judge-buttons"></div>
+              </section>
+              <section>
+                <h3>Неверно</h3>
+                <div id="finalWrongButtons" class="judge-buttons"></div>
+              </section>
+            </div>
+          </article>
+          <section class="champion-panel hidden" id="championPanel">
+            <div class="champion-cup" aria-hidden="true">🏆</div>
+            <p class="eyebrow">Чемпион FearlessGame</p>
+            <h2 id="championTitle"></h2>
+            <p id="championScore"></p>
+          </section>
+        </section>
+      </section>
+
+      <section class="game-view hidden" id="millionaireGameView">
+        <header class="game-header">
+          <div class="game-title">
+            <img class="small-mark" src="/assets/logo.svg" alt="" />
+            <div>
+              <p class="eyebrow" id="millionaireSourceLabel">GigaChat</p>
+              <h1>Кто хочет стать миллионером?</h1>
+            </div>
+          </div>
+          <div class="header-actions">
+            <button class="ghost-button" type="button" data-go-home>На главную</button>
+            <button class="ghost-button" type="button" id="newMillionaireButton">Новая игра</button>
+          </div>
+        </header>
+
+        <div class="millionaire-layout">
+          <section class="millionaire-stage">
+            <div class="millionaire-status">
+              <span id="millionairePlayerName">Игрок</span>
+              <strong id="millionaireCurrentPrize">0</strong>
+            </div>
+            <div class="lifelines">
+              <button class="ghost-button" type="button" id="fiftyButton">50:50</button>
+              <button class="ghost-button" type="button" id="audienceButton">Зал</button>
+              <button class="ghost-button" type="button" id="expertButton">Эксперт</button>
+            </div>
+            <article class="millionaire-question">
+              <p class="eyebrow" id="millionaireLevelLabel">Вопрос 1</p>
+              <h2 id="millionaireQuestionText"></h2>
+              <div class="millionaire-options" id="millionaireOptions"></div>
+              <p class="answer-feedback" id="millionaireFeedback"></p>
+            </article>
+            <div class="setup-actions">
+              <button class="danger-button" type="button" id="takeMoneyButton">Забрать выигрыш</button>
+              <button class="ghost-button hidden" type="button" id="nextMillionaireButton">Следующий вопрос</button>
+            </div>
+          </section>
+
+          <aside class="money-ladder" id="moneyLadder" aria-label="Денежная лестница"></aside>
+        </div>
+      </section>
+    </main>
+
+    <dialog class="question-dialog" id="questionDialog">
+      <div class="question-card">
+        <div class="question-topline">
+          <span id="questionCategory">Категория</span>
+          <strong id="questionValue">100</strong>
+        </div>
+        <h2 id="questionText"></h2>
+
+        <div class="answer-box hidden" id="answerBox">
+          <span>Ответ</span>
+          <strong id="answerText"></strong>
+          <p id="factText"></p>
+        </div>
+
+        <div class="dialog-actions">
+          <button class="ghost-button" type="button" id="showAnswerButton">Показать ответ</button>
+          <button class="ghost-button" type="button" id="returnQuestionButton">Вернуть вопрос</button>
+          <button class="danger-button" type="button" id="skipQuestionButton">Никто не ответил</button>
+        </div>
+
+        <div class="judge-grid">
+          <section>
+            <h3>Верно</h3>
+            <div id="correctButtons" class="judge-buttons"></div>
+          </section>
+          <section>
+            <h3>Неверно</h3>
+            <div id="wrongButtons" class="judge-buttons"></div>
+          </section>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
